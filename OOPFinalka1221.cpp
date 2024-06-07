@@ -1,7 +1,9 @@
 #include <iostream>
-#include <vector>
 #include <fstream>
+#include <vector>
 #include <string>
+
+
 using namespace std;
 
 struct Athlete
@@ -50,7 +52,7 @@ void addResult()
     getline(cin, result.athleteName);
     cout << "Enter event's name: ";
     getline(cin, result.eventName);
-    cout << "Enter result: ";
+    cout << "Enter result time: ";
     cin >> result.time;
     cin.ignore();
     results.push_back(result);
@@ -63,21 +65,19 @@ void saveAthletesToFile()
         outFile << athlete.name << "," << athlete.coach << "," << athlete.country << endl;
     }
     outFile.close();
+    cout << "Athletes saved to file.\n";
 }
 void loadAthletesFromFile()
 {
     ifstream inFile("athletes.txt");
-    if (inFile.is_open())
-    {
+    if (inFile.is_open()) {
         athletes.clear();
         string line;
-        while (getline(inFile, line))
-        {
+        while (getline(inFile, line)) {
             string name, coach, country;
             size_t pos1 = line.find(',');
             size_t pos2 = line.rfind(',');
-            if (pos1 != string::npos && pos2 != string::npos && pos1 != pos2)
-            {
+            if (pos1 != string::npos && pos2 != string::npos && pos1 != pos2) {
                 name = line.substr(0, pos1);
                 coach = line.substr(pos1 + 1, pos2 - pos1 - 1);
                 country = line.substr(pos2 + 1);
@@ -88,7 +88,7 @@ void loadAthletesFromFile()
         inFile.close();
         cout << "Athletes loaded from file.\n";
     }
-    else
+    else 
     {
         cout << "Unable to open athletes file.\n";
     }
@@ -101,8 +101,9 @@ void saveEventsToFile()
         outFile << event.name << endl;
     }
     outFile.close();
+    cout << "Events saved to file.\n";
 }
-void loadEventsFromFile() 
+void loadEventsFromFile()
 {
     ifstream inFile("events.txt");
     if (inFile.is_open()) {
@@ -121,30 +122,28 @@ void loadEventsFromFile()
         cout << "Unable to open events file.\n";
     }
 }
-void saveResultsToFile()
+void saveResultsToFile() 
 {
     ofstream outFile("results.txt");
-    for (const auto& result : results)
+    for (const auto& result : results) 
     {
         outFile << result.athleteName << "," << result.eventName << "," << result.time << endl;
     }
     outFile.close();
+    cout << "Results saved to file.\n";
 }
-void loadResultsFromFile() 
+void loadResultsFromFile()
 {
     ifstream inFile("results.txt");
-    if (inFile.is_open())
-    {
+    if (inFile.is_open()) {
         results.clear();
         string line;
-        while (getline(inFile, line))
-        {
+        while (getline(inFile, line)) {
             string athleteName, eventName;
             float time;
             size_t pos1 = line.find(',');
             size_t pos2 = line.rfind(',');
-            if (pos1 != string::npos && pos2 != string::npos && pos1 != pos2)
-            {
+            if (pos1 != string::npos && pos2 != string::npos && pos1 != pos2) {
                 athleteName = line.substr(0, pos1);
                 eventName = line.substr(pos1 + 1, pos2 - pos1 - 1);
                 time = stof(line.substr(pos2 + 1));
@@ -155,17 +154,77 @@ void loadResultsFromFile()
         inFile.close();
         cout << "Results loaded from file.\n";
     }
-    else
+    else 
     {
         cout << "Unable to open results file.\n";
+    }
+}
+void displayAthletes() 
+{
+    cout << "Athletes:\n";
+    for (const auto& athlete : athletes)
+    {
+        cout << "Name: " << athlete.name << ", Coach: " << athlete.coach << ", Country: " << athlete.country << endl;
+    }
+}
+void displayEvents() 
+{
+    cout << "Events:\n";
+    for (const auto& event : events)
+    {
+        cout << "Name: " << event.name << endl;
+    }
+}
+void displayResults() 
+{
+    cout << "Results:\n";
+    for (const auto& result : results)
+    {
+        cout << "Athlete: " << result.athleteName << ", Event: " << result.eventName << ", Time: " << result.time << endl;
+    }
+}
+void determineWinners() 
+{
+    if (events.empty())
+    {
+        cout << "No events available.\n";
+        return;
+    }
+
+    cout << "Enter the event name to determine the winner: ";
+    string eventName;
+    getline(cin, eventName);
+
+    float bestTime = -1;
+    string winner;
+
+    for (const auto& result : results) 
+    {
+        if (result.eventName == eventName) 
+        {
+            if (bestTime == -1 || result.time < bestTime) 
+            {
+
+                bestTime = result.time;
+                winner = result.athleteName;
+            }
+        }
+    }
+    if (!winner.empty()) 
+    {
+        cout << "The winner of the event " << eventName << " is " << winner << " with a time of " << bestTime << " seconds.\n";
+    }
+    else 
+    {
+        cout << "No results found for the event " << eventName << ".\n";
     }
 }
 int main()
 {
     int choice;
-    do 
+    do
     {
-        cout << "1. Add athlete\n2. Add event\n3. Add result\n4. Save athletes to file\n5. Load athletes from file\n6. Save events to file\n7. Load events from file\n8. Save results to file\n9. Load results from file\n10. Exit\n";
+        cout << "1. Add athlete\n2. Add event\n3. Add result\n4. Save athletes to file\n5. Load athletes from file\n6. Save events to file\n7. Load events from file\n8. Save results to file\n9. Load results from file\n10. Display athletes\n11. Display events\n12. Display results\n13. Determine winners\n14. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
         cin.ignore();
@@ -199,10 +258,22 @@ int main()
             loadResultsFromFile();
             break;
         case 10:
+            displayAthletes();
+            break;
+        case 11:
+            displayEvents();
+            break;
+        case 12:
+            displayResults();
+            break;
+        case 13:
+            determineWinners();
+            break;
+        case 14:
             cout << "Exiting program.\n";
             break;
         default:
             cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 10);
+    } while (choice != 14);
 }
